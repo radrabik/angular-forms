@@ -2,7 +2,7 @@
 
 <div class="col-md-5">
 
-  <form #userForm="ngForm">
+  <form #userForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
     {{ userForm.value | json }}
     <hr />
     {{ userModel | json }}
@@ -20,15 +20,23 @@
 
     <div class="form-group">
       <label>Phone</label>
-      <input type="tel" pattern="^\d{10}$" #phone="ngModel" [class.is-invalid]="phone.invalid && phone.touched" class="form-control" name="phone" [(ngModel)]="userModel.phone">
-      <small *ngIf="!phone.valid && phone.touched" class="text-danger">Phone number must be 10 digits</small>
+      <input type="tel" pattern="^\d{10}$" #phone="ngModel" [class.is-invalid]="phone.invalid && phone.touched" class="form-control" name="phone" [(ngModel)]="userModel.phone" required>
+
+      <div *ngIf="phone.errors && (phone.invalid || phone.touched)">
+        <small class="text-danger" *ngIf="phone.errors.pattern">Phone number must be 10 digits</small>
+        <small class="text-danger" *ngIf="phone.errors.required">Phone number is required</small>
+      </div>
+
     </div>
 
     <div class="form-group">
-      <select class="custom-select" name="topic" [(ngModel)]="userModel.topic">
-        <option selected> I am interested in</option>
+      <select (blur)="validateTopic(topic.value)" (change)="validateTopic(topic.value)" #topic="ngModel" [class.is-invalid]="topicHasError && topic.touched" class="custom-select" name="topic" [(ngModel)]="userModel.topic">
+        <option value="default">I am interested in</option>
         <option *ngFor="let topic of topics">{{ topic }}</option>
       </select>
+
+      <small class="text-danger" *ngIf="topicHasError">Please choose a topic</small>
+
     </div>
 
     <div class="mb-3">
@@ -48,7 +56,7 @@
       <label class="form-check-label">Send me promotional offers</label>
     </div>
 
-    <button class="btn btn-primary" type="submit"> Submit </button>
+    <button class="btn btn-primary" type="submit" [disabled]="!userForm.valid || topicHasError"> Submit </button>
 
   </form>
 

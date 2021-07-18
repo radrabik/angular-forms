@@ -1,5 +1,6 @@
 import { Component, VERSION } from '@angular/core';
 import { User } from './user';
+import { DataService } from './data.service'
 
 @Component({
   selector: 'my-app',
@@ -8,5 +9,31 @@ import { User } from './user';
 })
 export class AppComponent  {
   topics = ['Angular', 'React', 'Vue'];
-  userModel = new User('Rado', 'radrabik@gmail.com', 11122333, '', 'morning', true)
+  topicHasError = false;
+
+  userModel = new User('Rado', 'radrabik@gmail.com', 1112223334, 'I am interested in', 'morning', true)
+
+  constructor(private dataService: DataService) {}
+
+  validateTopic(value) {
+    // ..
+    console.log(value);
+    if (value === 'default') {
+      this.topicHasError = true;
+    } else {
+      this.topicHasError = false;
+    }
+
+  }
+
+  onSubmit() {
+    console.log(this.userModel);
+
+    this.dataService.postAPI(this.userModel)
+      .subscribe(
+        data => console.log('Success!', data),
+        error => console.error('Error!', error)
+
+      )
+  }
 }
